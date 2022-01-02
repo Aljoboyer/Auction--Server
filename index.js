@@ -45,14 +45,6 @@ async function run(){
 
         }) 
 
-        // get single auction product by id
-        app.get('/auctionproduct/:id',async(req,res)=>{
-            const id=req.params.id;
-            const query={_id: ObjectId(id)};
-            const result = await AuctionProductCollection.findOne(query);
-            res.json(result);
-          
-        })
 
     //-----------------Auctioneer API END----------------//
     //-------------------User API START------------------//
@@ -63,22 +55,7 @@ async function run(){
             res.json(result);
         })
 
-        // ----------User Bidding record-----------//
-        app.put('/userBid',async(req,res)=>{
-            const userId = req.body.userId;
-            const productId = req.body.productId;
-            const biddingPrice = req.body.price;
-            const query={_id: ObjectId(productId)};
-            const product= await AuctionProductCollection.findOne(query);
-            const newBidderInfo = {userId:userId,biddingPrice:biddingPrice}
-            const bidArray = [...product.bidarray,newBidderInfo]
-            const options = {upsert:true};
-            const updateDoc = { $set:{
-                "bidarray":bidArray
-            } };
-            const result = await AuctionProductCollection.updateOne(query,updateDoc,options);
-            res.json(result);
-        })
+       
     //--------------------User API END-------------------//
     }
     finally{
