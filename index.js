@@ -42,13 +42,7 @@ async function run(){
             const result = await cursor.toArray();
             res.send(result)
         })
-        //Auctioneer geting bid details
-        app.get('/GetBidDetails/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = {_id: ObjectId(id)};
-            const result = await AuctionProductCollection.findOne(query);
-            res.send(result)
-        })
+       
     //-----------------Auctioneer API END----------------//
     }
     finally{
