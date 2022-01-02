@@ -36,12 +36,19 @@ async function run(){
     //-----------------BookMaker API END----------------//
 
         //------------------Auctioneer API START--------------//
-        //Book Maker posting auction product to database
+        //Auctioneer geting auction product from database
         app.get('/getAcution', async (req, res) => {
             const cursor = AuctionProductCollection.find({});
             const result = await cursor.toArray();
             res.send(result)
-        }) 
+        })
+        //Auctioneer geting bid details
+        app.get('/GetBidDetails/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await AuctionProductCollection.findOne(query);
+            res.send(result)
+        })
     //-----------------Auctioneer API END----------------//
     }
     finally{
