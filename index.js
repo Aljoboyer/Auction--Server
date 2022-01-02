@@ -19,6 +19,7 @@ async function run(){
         await client.connect(); 
         const database = client.db('OnlineFreeAuction');
         const AuctionProductCollection = database.collection('AuctionProductCollection');
+        const UsersCollection = database.collection('Users');
 
     //------------------BookMaker API START--------------//
         //Book Maker posting auction product to database
@@ -41,15 +42,44 @@ async function run(){
             const cursor = AuctionProductCollection.find({});
             const result = await cursor.toArray();
             res.send(result)
-        })
-        //Auctioneer geting bid details
-        app.get('/GetBidDetails/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+
+        }) 
+
+        // get single auction product by id
+        app.get('/auctionproduct/:id',async(req,res)=>{
+            const id=req.params.id;
+            const query={_id: ObjectId(id)};
             const result = await AuctionProductCollection.findOne(query);
-            res.send(result)
+            res.json(result);
+          
         })
+
     //-----------------Auctioneer API END----------------//
+    //-------------------User API START------------------//
+        //------------ Save User in Database --------//
+        app.post('/userPost',async(req,res)=>{
+            const userInfo = req.body;
+            const result = await UsersCollection.insertOne(userInfo);
+            res.json(result);
+        })
+
+        // ----------User Bidding record-----------//
+        app.put('/userBid',async(req,res)=>{
+            const userId = req.body.userId;
+            const productId = req.body.productId;
+            const biddingPrice = req.body.price;
+            const query={_id: ObjectId(productId)};
+            const product= await AuctionProductCollection.findOne(query);
+            const newBidderInfo = {userId:userId,biddingPrice:biddingPrice}
+            const bidArray = [...product.bidarray,newBidderInfo]
+            const options = {upsert:true};
+            const updateDoc = { $set:{
+                "bidarray":bidArray
+            } };
+            const result = await AuctionProductCollection.updateOne(query,updateDoc,options);
+            res.json(result);
+        })
+    //--------------------User API END-------------------//
     }
     finally{
 
