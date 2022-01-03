@@ -20,7 +20,15 @@ async function run(){
         const database = client.db('OnlineFreeAuction');
         const AuctionProductCollection = database.collection('AuctionProductCollection');
         const UsersCollection = database.collection('Users');
-
+        const WinnerCollection = database.collection('WinnerCollection');
+    
+    //---------------OTHER----------//
+        app.get('/userCheck', async (req, res) => {
+            const email = req.query.email
+            const query = {email: email};
+            const result = await UsersCollection.findOne(query);
+            res.send(result)
+        })
     //------------------BookMaker API START--------------//
         //Book Maker posting auction product to database
         app.post('/auctionpost', async (req, res) => {
@@ -36,9 +44,8 @@ async function run(){
         }) 
         //bookmaker geting data for managing
         app.get('/GetBookmakerAcution', async (req, res) => {
-            const email = req.query.email;
-            const query = {email: email};
-            const result = await AuctionProductCollection.find(query).toArray();
+            const cursor = AuctionProductCollection.find({})
+            const result = await cursor.toArray()
             res.send(result)
         })
         //book maker deleting auction data
@@ -61,6 +68,26 @@ async function run(){
             const result = await AuctionProductCollection.updateOne(query, updateDoc, option)
             res.json(result)
         })
+        //book maker making winner
+        app.post('/MakingWiner', async (req, res) => {
+            console.log(req.body)
+            const data = req.body;
+            const result = await WinnerCollection.insertOne(data);
+            res.json(result)
+        })
+         //book maker making another bookmaker 
+         app.put('/makeBookMaker', async (req, res) => {
+             const email = req.query.email
+             const filter = {email: email};
+             const option = {upsert: true};
+             const updateDoc = {
+                 $set: {
+                     role: 'bookmaker'
+                 }
+             }
+             const result = await UsersCollection.updateOne(filter, updateDoc, option)
+             res.json(result)
+         })
     //-----------------BookMaker API END----------------//
 
         //------------------Auctioneer API START--------------//
@@ -71,12 +98,9 @@ async function run(){
             res.send(result)
 
         }) 
-
-
         // get single auction product by id
         app.get('/GetBidDetails/:id',async(req,res)=>{
             const id = req.params.id;
-            console.log('fromd biddetails',id) 
             const query={_id: ObjectId(id)};
             const result = await AuctionProductCollection.findOne(query);
             res.send(result);
@@ -92,8 +116,6 @@ async function run(){
             const result = await UsersCollection.insertOne(userInfo);
             res.json(result);
         })
-
-   
         // ----------User Bidding record-----------//
         app.put('/postingBid', async(req, res) => {
             
@@ -120,8 +142,13 @@ async function run(){
             const result = await AuctionProductCollection.updateOne(query,updateDoc,options);
             res.json(result);
         }) 
-
-
+        //auctioneer geting winner data
+        app.get('/getWinnerData' , async (req, res) => {
+            const email = req.query.email
+            const query = {email: email};
+            const result = await WinnerCollection.find(query).toArray()
+            res.send(result)
+        })
 
     //--------------------User API END-------------------//
     }
