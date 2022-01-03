@@ -72,6 +72,7 @@ async function run(){
 
         }) 
 
+
         // get single auction product by id
         app.get('/GetBidDetails/:id',async(req,res)=>{
             const id = req.params.id;
@@ -82,6 +83,7 @@ async function run(){
           
         })
 
+
     //-----------------Auctioneer API END----------------//
     //-------------------User API START------------------//
         //------------ Save User in Database --------//
@@ -90,6 +92,7 @@ async function run(){
             const result = await UsersCollection.insertOne(userInfo);
             res.json(result);
         })
+
    
         // ----------User Bidding record-----------//
         app.put('/postingBid', async(req, res) => {
@@ -117,6 +120,9 @@ async function run(){
             const result = await AuctionProductCollection.updateOne(query,updateDoc,options);
             res.json(result);
         }) 
+
+
+
     //--------------------User API END-------------------//
     }
     finally{
