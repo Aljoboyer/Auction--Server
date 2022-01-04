@@ -149,7 +149,12 @@ async function run(){
             const result = await WinnerCollection.find(query).toArray()
             res.send(result)
         })
-
+     app.get('/GetCategoryData', async (req, res) => {
+            const category = req.query.category
+            const query = {category: category}
+            const result = await AuctionProductCollection.find(query).toArray();
+            res.send(result)
+        })
     //--------------------User API END-------------------//
     }
     finally{
